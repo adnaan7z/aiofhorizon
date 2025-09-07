@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Become a Local Guide — Hidden Horizons</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  :root{--navy:#0C1426;--muted:#1E3353;--text:#F5F7FB;--sub:#BFCAE0;--primary:#16B39A;--primary-2:#119681;--accent:#F97316;--shadow:0 16px 44px rgba(6,13,30,.35);--radius:18px}
+  *{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0A1222 0%, #0C1426 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:60;background:rgba(12,20,38,.92);backdrop-filter:blur(12px);border-bottom:1px solid #15243d}
+  .container{max-width:1160px;margin:0 auto;padding:14px 16px}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;flex-direction:column}.brand .name{font-weight:800}.brand .tag{color:var(--sub);font-size:12.5px}
+  .menu{display:flex;gap:8px;flex-wrap:wrap}.menu a{padding:8px 12px;border:1px solid transparent;border-radius:12px;color:#e8f2ff}.menu a:hover{border-color:#254065;background:#0f1a2b}
+  .cta{background:linear-gradient(180deg,var(--accent),#ed6d12);color:#2b1203;padding:9px 14px;border-radius:14px;border:1px solid #f99c36;font-weight:700}
+  .hero{min-height:180px;display:grid;place-items:center;text-align:center;background:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat}
+  .hero h1{margin:0;font-size:clamp(22px,4.6vw,36px);background:linear-gradient(90deg,#fff,#FFE1C7,#FAD6A5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sectionTitle{max-width:980px;margin:22px auto 10px;padding:0 16px}
+  .cardForm{max-width:980px;margin:0 auto 28px;padding:16px;border:1px solid var(--muted);background:#0E1A2F;border-radius:var(--radius);box-shadow:var(--shadow)}
+  .formGrid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .col-6{grid-column:span 12}@media(min-width:720px){.col-6{grid-column:span 6}}.col-12{grid-column:span 12}
+  label{display:block;font-size:13px;color:#cfe0ff;margin:6px 0 4px}
+  input,select,textarea{width:100%;background:#0f1b31;border:1px solid var(--muted);color:#e8f2ff;border-radius:12px;padding:10px 12px;outline:none}
+  textarea{min-height:110px;resize:vertical}.hint{font-size:12px;color:#9fb5d6}
+  .pillRow{display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--muted);background:#11203a;padding:8px 10px;border-radius:999px}
+  .btn{border:1px solid var(--muted);background:#11203a;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary-2));border-color:var(--primary);color:#052825}
+  .toast{position:fixed;right:16px;bottom:16px;padding:12px 14px;border-radius:12px;background:#0f1b31;border:1px solid #23406a;color:#e8f2ff;box-shadow:var(--shadow);display:none}
+  footer{margin:36px 0 16px;color:#BFCAE0;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <span class="name">Hidden Horizons Guide</span>
+      <span class="tag">Discover hidden places, culture & food with local guides</span>
+    </div>
+    <nav class="menu">
+      <a href="index.html">Explore</a>
+      <a href="become-guide.html" class="cta">Become a Local Guide</a>
+      <a href="contact.html">Contact</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero"><h1>Become a Local Guide</h1></section>
+
+<h2 class="sectionTitle">Apply</h2>
+<div class="cardForm">
+  <p class="hint" style="margin-top:0">We feature <b>one verified guide per location</b>. Fill this form to apply.</p>
+  <form id="guideForm" class="formGrid">
+    <div class="col-6"><label for="fullName">Full Name</label><input id="fullName" name="name" required placeholder="Your full name"></div>
+    <div class="col-6"><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="you@example.com"></div>
+    <div class="col-6"><label for="phone">Phone (WhatsApp)</label><input id="phone" name="phone" required inputmode="tel" placeholder="+91 XXXXX XXXXX"></div>
+    <div class="col-6"><label for="area">Your Area / Island</label><input id="area" name="area" required placeholder="e.g., Port Blair, Wandoor, Havelock"></div>
+    <div class="col-6">
+      <label for="district">District</label>
+      <select id="district" name="district" required>
+        <option>South Andaman</option><option>North & Middle Andaman</option><option>Nicobar</option>
+      </select>
+    </div>
+    <div class="col-6">
+      <label for="specialty">Specialty</label>
+      <select id="specialty" name="specialty" required>
+        <option>City & Heritage</option><option>Beaches & Snorkel</option><option>Trekking & Nature</option><option>Birding & Mangroves</option><option>Food Trails</option>
+      </select>
+    </div>
+    <div class="col-6">
+      <label>Languages</label>
+      <div class="pillRow">
+        <label class="pill"><input type="checkbox" name="langs" value="EN"> EN</label>
+        <label class="pill"><input type="checkbox" name="langs" value="HI"> HI</label>
+        <label class="pill"><input type="checkbox" name="langs" value="BN"> BN</label>
+        <label class="pill"><input type="checkbox" name="langs" value="TA"> TA</label>
+      </div>
+    </div>
+    <div class="col-6"><label for="rate">Typical Rate (per day, optional)</label><input id="rate" name="rate" placeholder="₹1500"></div>
+    <div class="col-12"><label for="bio">Short Bio</label><textarea id="bio" name="bio" placeholder="Experience, certifications, seasons…"></textarea></div>
+    <div class="col-12"><label class="pill"><input type="checkbox" id="agree" required> I accept the community rules.</label></div>
+    <input type="hidden" name="access_key" value="afc77fa9-3af5-41cf-8244-46281f580f91">
+    <input type="hidden" name="subject" value="New Local Guide Application — Hidden Horizons">
+    <div class="col-12"><button class="btn primary" type="submit">Submit Application</button></div>
+  </form>
+</div>
+
+<footer>© 2025 Hidden Horizons Guide · Developed by DBRAIT Students</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none'},3000)}
+document.getElementById('guideForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  try{
+    const res = await fetch('https://api.web3forms.com/submit',{method:'POST',body:new FormData(e.target)});
+    toast(res.ok?'Thanks! We\'ll review your guide application.':'Failed to submit. Try again later.');
+    if(res.ok) e.target.reset();
+  }catch(err){ toast('Network error. Please try again.'); }
+});
+</script>
+</body>
+</html>

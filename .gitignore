@@ -1,0 +1,4 @@
+videos/
+audio/
+node_modules/
+.env

@@ -1,0 +1,763 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Hidden Horizons Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --navy:#0C1426; --muted:#1E3353; --text:#F5F7FB; --sub:#BFCAE0;
+    --primary:#16B39A; --primary-2:#119681;
+    --accent:#F97316; --shadow:0 16px 44px rgba(6,13,30,.35); --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(180deg,#0A1222 0%, #0C1426 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:60;background:rgba(12,20,38,.92);backdrop-filter:blur(12px);border-bottom:1px solid #15243d}
+  .container{max-width:1160px;margin:0 auto;padding:14px 16px}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;flex-direction:column}
+  .brand .name{font-weight:800}
+  .brand .tag{color:var(--sub);font-size:12.5px}
+  .menu{display:flex;gap:8px;flex-wrap:wrap}
+  .menu a{padding:8px 12px;border:1px solid transparent;border-radius:12px;color:#e8f2ff}
+  .menu a:hover{border-color:#254065;background:#0f1a2b}
+  .cta{background:linear-gradient(180deg,var(--accent),#ed6d12);color:#2b1203;padding:9px 14px;border-radius:14px;border:1px solid #f99c36;font-weight:700}
+
+  /* Hero */
+  .hero{min-height:220px;display:grid;place-items:center;text-align:center;background:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat}
+  .hero h1{font-size:clamp(22px,4.6vw,36px);margin:0;background:linear-gradient(90deg,#fff,#FFE1C7,#FAD6A5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{margin-top:8px;color:#F8F8F8;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+
+  /* Tabs + search */
+  .tabs{display:flex;gap:10px;padding:10px 12px;overflow-x:auto}
+  .tabs::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--muted);padding:10px 14px;border-radius:999px;background:#132648;color:#EAF2FF;cursor:pointer;transition:.18s}
+  .chip:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+  .chip.active{background:linear-gradient(180deg,var(--primary),var(--primary-2));border-color:var(--primary);color:#062e2a;font-weight:800}
+  .searchWrap{padding:0 12px 10px}
+  .search{width:100%;display:flex;align-items:center;gap:8px;background:#0f1b31;border:1px solid var(--muted);border-radius:12px;padding:10px 12px}
+  .search input{flex:1;background:transparent;border:none;outline:none;color:#EAF2FF;font-size:14px}
+  .search small{color:var(--sub)}
+
+  /* Cards grid */
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;padding:18px}
+  .card{grid-column:span 12;background:#0E1A2F;border:1px solid var(--muted);border-radius:var(--radius);overflow:hidden;transition:.2s;opacity:0;transform:translateY(12px)}
+  .card.reveal{opacity:1;transform:translateY(0)}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#2a4a75}
+  .thumb{aspect-ratio:16/9;background:#0d1424 center/cover no-repeat}
+  .body{padding:14px}
+  .title2{margin:6px 0;font-weight:800;color:#fff}
+  .meta{color:#dfe8f6;font-size:13px;margin-bottom:6px}
+  .kicker{font-size:12.5px;color:var(--sub)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .btn{border:1px solid var(--muted);background:#11203a;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;transition:.18s}
+  .btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary-2));border-color:var(--primary);color:#052825}
+
+  /* Detail */
+  .detail{max-width:980px;margin:8px auto 24px;padding:0 16px}
+  .heroMedia{aspect-ratio:16/9;background:#0b1324 center/cover no-repeat;border:1px solid var(--muted);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .facts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .fact{background:#0E1A2B;border:1px solid var(--muted);padding:6px 10px;border-radius:999px;color:#E8F2FF;font-size:12.5px}
+
+  /* Listen */
+  .listenBar{display:flex;gap:10px;align-items:center;margin-top:8px}
+  .progress{height:4px;background:#152239;border-radius:999px;overflow:hidden;flex:1}
+  .progress>i{display:block;height:4px;background:linear-gradient(90deg,var(--accent),var(--primary));width:0%}
+  .listenBtn{position:relative}
+  .eq{display:inline-flex;gap:2px;margin-left:6px}
+  .bar{width:3px;height:10px;background:currentColor;border-radius:2px;opacity:.85;transform-origin:bottom}
+
+  /* Bottom sheet */
+  .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#101c34;border-top:1px solid var(--muted);border-radius:16px 16px 0 0;box-shadow:0 -16px 40px rgba(0,0,0,.45);transition:bottom .22s ease;z-index:70}
+  .sheet.open{bottom:0}
+  .sheet .wrap{padding:16px}
+  .sheet h4{margin:4px 0 12px 0}
+  .btn.accent{background:linear-gradient(180deg,#F99C36,#F97316);border-color:#F99C36;color:#2b1203}
+
+  /* Video loader */
+  .videoWrap{position:relative}
+  .loader{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(12,20,38,.6),rgba(12,20,38,.35));backdrop-filter:blur(2px)}
+  .spinner{width:44px;height:44px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  footer{margin:36px 0 16px;color:var(--sub);text-align:center;padding:10px}
+  @media(min-width:640px){.card{grid-column:span 6}}
+  @media(min-width:980px){.card{grid-column:span 4}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <span class="name">Hidden Horizons Guide</span>
+      <span class="tag">Discover hidden places, culture & food with local guides</span>
+    </div>
+    <nav class="menu">
+      <a href="index.html">Explore</a>
+      <a href="become-guide.html" class="cta">Become a Local Guide</a>
+      <a href="contact.html">Contact</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Explore -->
+<section id="explore" class="hero">
+  <div>
+    <h1 id="heroTitle">Discover South Andaman</h1>
+    <div class="sub">Hidden Areas · Culture & Heritage · Food & Lifestyle</div>
+  </div>
+</section>
+
+<div class="tabs">
+  <button id="dist-south" class="chip active">South Andaman</button>
+  <button id="dist-north" class="chip">North & Middle Andaman</button>
+  <button id="dist-nic" class="chip">Nicobar</button>
+</div>
+
+<div class="tabs">
+  <button id="cat-hidden" class="chip active">Hidden Areas</button>
+  <button id="cat-culture" class="chip">Culture & Heritage</button>
+  <button id="cat-food" class="chip">Food & Lifestyle</button>
+</div>
+
+<div class="searchWrap">
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input id="search" type="text" placeholder="Search places, blocks, beaches…" />
+    <small id="searchCount"></small>
+  </div>
+</div>
+
+<div id="list" class="grid"></div>
+<section id="detail" class="detail" hidden></section>
+
+<footer>© 2025 Hidden Horizons Guide · Developed by DBRAIT Students</footer>
+
+<!-- Language chooser -->
+<div id="sheet" class="sheet" aria-hidden="true" role="dialog">
+  <div class="wrap">
+    <h4>Choose language</h4>
+    <div class="actions">
+      <button class="btn accent" onclick="playLang('en')">Listen in English</button>
+      <button class="btn accent" onclick="playLang('hi')">हिंदी में सुनें</button>
+      <button class="btn" onclick="closeSheet()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================== FALLBACK GUIDES BY AREA (ONE per area) ================== */
+const GUIDE_INDEX = {
+  'Port Blair': [{name:'Amit', area:'Port Blair', langs:['EN','HI'], spec:'City & Heritage', phone:'+919999000031'}],
+  'Wandoor': [{name:'Jagan', area:'Wandoor', langs:['HI','EN'], spec:'Mangroves & Boats', phone:'+919999000014'}],
+  'Havelock (Swaraj Dweep)': [{name:'Rohit', area:'Havelock', langs:['EN','HI'], spec:'Beaches & Snorkel', phone:'+919999000041'}],
+  'Neil Island (Shaheed Dweep)': [{name:'Arun', area:'Neil', langs:['HI','EN'], spec:'Island Circuits', phone:'+919999000051'}]
+};
+
+/* ================== FULL DATASETS (unchanged content) ================== */
+const DATASETS = {
+  south:{
+    /* Hidden / Nature */
+    hidden:[
+      {slug:'chidiya-tapu',title_en:'Chidiya Tapu (Sunset Point)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Famous golden sunset with birdlife; quiet coves if you walk away from the crowd.',
+        facts:['Easy','Best: Sunset'],history_en:'Popular viewpoint; stay behind the safety line at high tide.',
+        images:['images/chidiya-tapu-1.jpg','images/chidiya-tapu-2.jpg','images/chidiya-tapu-3.jpg','images/chidiya-tapu-4.jpg'],
+        video:'videos/chidiya-tapu.mp4',audio_en:'audio/chidiya-tapu-en.mp3',audio_hi:'audio/chidiya-tapu-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Chidiya+Tapu+Port+Blair',
+        guides:[{name:'Rahul',area:'Port Blair',langs:['EN','HI'],spec:'Sunset & short trails',phone:'+919999000010'}],
+        safety:['Watch for slippery rocks','Respect fences']
+      },
+      {slug:'munda-pahad',title_en:'Munda Pahad Trail',block:'Port Blair',district:'South Andaman',
+        overview_en:'Forest trek near Chidiya Tapu with dramatic sea-cliff lookouts.',
+        facts:['Moderate','60–90 min','Best: Evening'],history_en:'Hidden path to cliff views; go with locals; avoid late evenings.',
+        images:['images/munda-1.jpg','images/munda-2.jpg','images/munda-3.jpg','images/munda-4.jpg'],
+        video:'videos/munda-pahad.mp4',audio_en:'audio/munda-pahad-en.mp3',audio_hi:'audio/munda-pahad-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Munda+Pahad+Trail+South+Andaman',
+        guides:[{name:'Ravi',area:'Port Blair',langs:['EN','HI'],spec:'Trek',phone:'+919999000002'}],
+        safety:['Wear shoes','Carry torch','Stay on trail']
+      },
+      {slug:'collinpur-beach',title_en:'Collinpur Beach',block:'Port Blair',district:'South Andaman',
+        overview_en:'Quiet curved bay with soft sand and calm patches.',
+        facts:['Easy','Family-friendly'],history_en:'Less crowded than city beaches; great for picnics.',
+        images:['images/collinpur-1.jpg','images/collinpur-2.jpg','images/collinpur-3.jpg','images/collinpur-4.jpg'],
+        video:'videos/collinpur.mp4',audio_en:'audio/collinpur-en.mp3',audio_hi:'audio/collinpur-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Collinpur+Beach+Andaman'
+      },
+      {slug:'bada-balu',title_en:'Bada Balu Beach',block:'Port Blair',district:'South Andaman',
+        overview_en:'Wilder stretch with coarse sand and strong surf—photogenic, not for swimming.',
+        facts:['Scenic','Best: Morning'],history_en:'Remote feel; avoid deep water.',
+        images:['images/bada-balu-1.jpg','images/bada-balu-2.jpg','images/bada-balu-3.jpg','images/bada-balu-4.jpg'],
+        video:'videos/bada-balu.mp4',audio_en:'audio/bada-balu-en.mp3',audio_hi:'audio/bada-balu-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Bada+Balu+Beach+Andaman',
+        safety:['No lifeguards','Strong currents']
+      },
+      {slug:'shol-bay',title_en:'Shol Bay Beach',block:'Port Blair',district:'South Andaman',
+        overview_en:'Remote scenic cove; peaceful and uncrowded—best at sunrise.',
+        facts:['Easy','30–60 min','Best: Sunrise'],history_en:'Access by coastal paths with locals; keep shore clean.',
+        images:['images/shol-bay-1.jpg','images/shol-bay-2.jpg','images/shol-bay-3.jpg','images/shol-bay-4.jpg'],
+        video:'videos/shol-bay.mp4',audio_en:'audio/shol-bay-en.mp3',audio_hi:'audio/shol-bay-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Shol+Bay+South+Andaman',
+        guides:[{name:'Amit',area:'Port Blair',langs:['EN','HI'],spec:'Trek & coastal',phone:'+919999000001'}],
+        safety:['Visit with locals','Respect tides']
+      },
+      {slug:'wright-myo',title_en:'Wright Myo Forest',block:'Port Blair',district:'South Andaman',
+        overview_en:'Offbeat forest zone with bird calls and village paths.',
+        facts:['Easy','Nature walk'],history_en:'Local hamlets and greenery—great with a village guide.',
+        images:['images/wright-myo-1.jpg','images/wright-myo-2.jpg','images/wright-myo-3.jpg','images/wright-myo-4.jpg'],
+        video:'videos/wright-myo.mp4',audio_en:'audio/wright-myo-en.mp3',audio_hi:'audio/wright-myo-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Wright+Myo+Andaman'
+      },
+      {slug:'kurma-dera',title_en:'Kurma Dera (Coastal Hamlet)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Quiet village coast with rock pools and local life.',
+        facts:['Easy','Village vibe'],history_en:'Learn coastal routines; be respectful when photographing.',
+        images:['images/kurma-dera-1.jpg','images/kurma-dera-2.jpg','images/kurma-dera-3.jpg','images/kurma-dera-4.jpg'],
+        video:'videos/kurma-dera.mp4',audio_en:'audio/kurma-dera-en.mp3',audio_hi:'audio/kurma-dera-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Kurma+Dera+Andaman'
+      },
+      {slug:'north-bay-island',title_en:'North Bay Island',block:'Port Blair',district:'South Andaman',
+        overview_en:'Top spot for snorkeling, scuba, glass-bottom & semi-sub rides.',
+        facts:['Water sports','Day trip'],history_en:'Reach by boat from Aberdeen Jetty; book activities on island.',
+        images:['images/north-bay-1.jpg','images/north-bay-2.jpg','images/north-bay-3.jpg','images/north-bay-4.jpg'],
+        video:'videos/north-bay.mp4',audio_en:'audio/north-bay-en.mp3',audio_hi:'audio/north-bay-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/North+Bay+Island+Port+Blair'
+      },
+      {slug:'corbyns-cove',title_en:"Corbyn's Cove (Hidden Corners)",block:'Port Blair',district:'South Andaman',
+        overview_en:'Popular city beach—walk to the rocky ends for quieter corners.',
+        facts:['Easy','Sunset'],
+        images:['images/corbyns-1.jpg','images/corbyns-2.jpg','images/corbyns-3.jpg','images/corbyns-4.jpg'],
+        video:'videos/corbyns.mp4',audio_en:'audio/corbyns-en.mp3',audio_hi:'audio/corbyns-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Corbyn%27s+Cove+Port+Blair'
+      },
+      {slug:'wandoor-beach',title_en:'Wandoor Beach (Hidden Trails)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Sea-facing trees and mangrove fringes; quiet side trails.',
+        facts:['Easy','Mangroves'],history_en:'Gateway to MG Marine National Park; explore with local guide.',
+        images:['images/wandoor-1.jpg','images/wandoor-2.jpg','images/wandoor-3.jpg','images/wandoor-4.jpg'],
+        video:'videos/wandoor.mp4',audio_en:'audio/wandoor-en.mp3',audio_hi:'audio/wandoor-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Wandoor+Beach+Andaman'
+      },
+      {slug:'rutland-island',title_en:'Rutland Island (Untouched Corals)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Clear waters and coral patches—arrange local boat.',
+        facts:['Boat trip','Snorkeling'],history_en:'Remote village island; permits/boats via Wandoor.',
+        images:['images/rutland-1.jpg','images/rutland-2.jpg','images/rutland-3.jpg','images/rutland-4.jpg'],
+        video:'videos/rutland.mp4',audio_en:'audio/rutland-en.mp3',audio_hi:'audio/rutland-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Rutland+Island+Andaman'
+      },
+      {slug:'sippighat-mangroves',title_en:'Sippighat Mangroves (Kayak Trails)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Silent creeks perfect for sunrise/sunset kayaking.',
+        facts:['Kayaking','Best: Sunrise'],history_en:'Hire local kayaks; carry dry bag for phone/camera.',
+        images:['images/sippighat-1.jpg','images/sippighat-2.jpg','images/sippighat-3.jpg','images/sippighat-4.jpg'],
+        video:'videos/sippighat.mp4',audio_en:'audio/sippighat-en.mp3',audio_hi:'audio/sippighat-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Sippighat+Andaman'
+      },
+      {slug:'flat-bay',title_en:'Flat Bay (Birding Marshes)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Flat wetlands with seasonal birds—great with binoculars.',
+        facts:['Birding','Quiet'],history_en:'Ask locals for best viewing points.',
+        images:['images/flat-bay-1.jpg','images/flat-bay-2.jpg','images/flat-bay-3.jpg','images/flat-bay-4.jpg'],
+        video:'videos/flat-bay.mp4',audio_en:'audio/flat-bay-en.mp3',audio_hi:'audio/flat-bay-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Flat+Bay+Andaman'
+      },
+      {slug:'jolly-buoy',title_en:'Jolly Buoy Island (MG Marine NP)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Crystal water with live corals; seasonal opening.',
+        facts:['Permits','Boat trip'],history_en:'Part of MG Marine National Park; no plastic.',
+        images:['images/jolly-buoy-1.jpg','images/jolly-buoy-2.jpg','images/jolly-buoy-3.jpg','images/jolly-buoy-4.jpg'],
+        video:'videos/jolly-buoy.mp4',audio_en:'audio/jolly-buoy-en.mp3',audio_hi:'audio/jolly-buoy-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Jolly+Buoy+Island'
+      },
+      {slug:'red-skin',title_en:'Red Skin Island (MG Marine NP)',block:'Wandoor',district:'South Andaman',
+        overview_en:'Alternate to Jolly Buoy with coral viewing.',
+        facts:['Permits','Boat trip'],history_en:'Carry water; follow eco rules strictly.',
+        images:['images/red-skin-1.jpg','images/red-skin-2.jpg','images/red-skin-3.jpg','images/red-skin-4.jpg'],
+        video:'videos/red-skin.mp4',audio_en:'audio/red-skin-en.mp3',audio_hi:'audio/red-skin-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Red+Skin+Island+Andaman'
+      },
+      {slug:'radhanagar',title_en:'Radhanagar Beach (No.7)',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Legendary white sand; walk to far ends for hidden angles.',
+        facts:['Easy','Best: Sunset'],history_en:'Often ranked Asia’s best; keep dunes pristine.',
+        images:['images/radhanagar-1.jpg','images/radhanagar-2.jpg','images/radhanagar-3.jpg','images/radhanagar-4.jpg'],
+        video:'videos/radhanagar.mp4',audio_en:'audio/radhanagar-en.mp3',audio_hi:'audio/radhanagar-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Radhanagar+Beach'
+      },
+      {slug:'elephant-beach',title_en:'Elephant Beach (Trek & Snorkel)',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Reach by trek or boat; snorkeling and water activities.',
+        facts:['Trek 30–40min','Snorkel'],history_en:'Check tide and boat timings.',
+        images:['images/elephant-1.jpg','images/elephant-2.jpg','images/elephant-3.jpg','images/elephant-4.jpg'],
+        video:'videos/elephant-beach.mp4',audio_en:'audio/elephant-beach-en.mp3',audio_hi:'audio/elephant-beach-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Elephant+Beach+Havelock'
+      },
+      {slug:'kalapathar',title_en:'Kalapathar Beach (Sunrise)',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Dramatic black rocks with calm morning light.',
+        facts:['Easy','Best: Sunrise'],history_en:'Head early; watch algae on rocks.',
+        images:['images/kalapathar-1.jpg','images/kalapathar-2.jpg','images/kalapathar-3.jpg','images/kalapathar-4.jpg'],
+        video:'videos/kalapathar.mp4',audio_en:'audio/kalapathar-en.mp3',audio_hi:'audio/kalapathar-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Kalapathar+Beach'
+      },
+      {slug:'govind-nagar',title_en:'Govind Nagar Beach',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Shallow lagoon with swings and homestays nearby.',
+        facts:['Lagoon','Relaxed'],
+        images:['images/govind-1.jpg','images/govind-2.jpg','images/govind-3.jpg','images/govind-4.jpg'],
+        video:'videos/govind-nagar.mp4',audio_en:'audio/govind-nagar-en.mp3',audio_hi:'audio/govind-nagar-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Govind+Nagar+Beach'
+      },
+      {slug:'vijaynagar',title_en:'Vijaynagar Beach',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Long coconut-lined beach; quiet pockets between resorts.',
+        facts:['Easy','Photo spots'],
+        images:['images/vijaynagar-1.jpg','images/vijaynagar-2.jpg','images/vijaynagar-3.jpg','images/vijaynagar-4.jpg'],
+        video:'videos/vijaynagar.mp4',audio_en:'audio/vijaynagar-en.mp3',audio_hi:'audio/vijaynagar-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Vijaynagar+Beach'
+      },
+      {slug:'neils-cove',title_en:"Neil's Cove (Hidden Lagoon)",block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Shallow turquoise pool near Radhanagar—check tides.',
+        facts:['Hidden','Best: Morning'],
+        images:['images/neils-cove-1.jpg','images/neils-cove-2.jpg','images/neils-cove-3.jpg','images/neils-cove-4.jpg'],
+        video:'videos/neils-cove.mp4',audio_en:'audio/neils-cove-en.mp3',audio_hi:'audio/neils-cove-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Neil%27s+Cove+Havelock'
+      },
+      {slug:'yellow-garden',title_en:'Yellow Garden (Sitapur Extension)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Hidden sunrise spot beyond Sitapur with rock shelves.',
+        facts:['Hidden','Best: Sunrise'],
+        images:['images/yellow-garden-1.jpg','images/yellow-garden-2.jpg','images/yellow-garden-3.jpg','images/yellow-garden-4.jpg'],
+        video:'videos/yellow-garden.mp4',audio_en:'audio/yellow-garden-en.mp3',audio_hi:'audio/yellow-garden-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Yellow+Garden+Neil+Island'
+      },
+      {slug:'ram-nagar',title_en:'Ram Nagar Beach',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Peaceful and less visited, good for quiet walks.',
+        facts:['Easy','Quiet'],
+        images:['images/ram-nagar-1.jpg','images/ram-nagar-2.jpg','images/ram-nagar-3.jpg','images/ram-nagar-4.jpg'],
+        video:'videos/ram-nagar.mp4',audio_en:'audio/ram-nagar-en.mp3',audio_hi:'audio/ram-nagar-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Ram+Nagar+Beach+Neil'
+      },
+      {slug:'sitapur',title_en:'Sitapur Beach (Sunrise)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Eastern edge beach with lagoons and rock pools.',
+        facts:['Best: Sunrise','Tide pools'],
+        images:['images/sitapur-1.jpg','images/sitapur-2.jpg','images/sitapur-3.jpg','images/sitapur-4.jpg'],
+        video:'videos/sitapur.mp4',audio_en:'audio/sitapur-en.mp3',audio_hi:'audio/sitapur-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Sitapur+Beach+Neil'
+      },
+      {slug:'laxmanpur',title_en:'Laxmanpur Beach (Sunset)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Wide sandy sunset beach; shells and tidal flats.',
+        facts:['Easy','Best: Sunset'],
+        images:['images/laxmanpur-1.jpg','images/laxmanpur-2.jpg','images/laxmanpur-3.jpg','images/laxmanpur-4.jpg'],
+        video:'videos/laxmanpur.mp4',audio_en:'audio/laxmanpur-en.mp3',audio_hi:'audio/laxmanpur-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Laxmanpur+Beach+Neil'
+      },
+      {slug:'bharatpur',title_en:'Bharatpur Beach (Water Sports)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Boats, snorkeling, and shallow coral patches.',
+        facts:['Water sports','Family-friendly'],
+        images:['images/bharatpur-1.jpg','images/bharatpur-2.jpg','images/bharatpur-3.jpg','images/bharatpur-4.jpg'],
+        video:'videos/bharatpur.mp4',audio_en:'audio/bharatpur-en.mp3',audio_hi:'audio/bharatpur-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Bharatpur+Beach+Neil'
+      },
+      {slug:'natural-bridge',title_en:'Natural Bridge (Howrah Bridge)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Rock arch with marine life in tide pools—visit at low tide.',
+        facts:['Best: Low tide','Guide recommended'],
+        images:['images/natural-bridge-1.jpg','images/natural-bridge-2.jpg','images/natural-bridge-3.jpg','images/natural-bridge-4.jpg'],
+        video:'videos/natural-bridge.mp4',audio_en:'audio/natural-bridge-en.mp3',audio_hi:'audio/natural-bridge-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Natural+Bridge+Neil'
+      }
+    ],
+
+    /* Culture / Heritage */
+    culture:[
+      {slug:'cellular-jail',title_en:'Cellular Jail (Kala Pani)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Iconic freedom struggle site; museum & evening light-and-sound show.',
+        facts:['Tickets','1–2 hrs'],history_en:'Built 1906 by British; housed Indian freedom fighters.',
+        images:['images/cellular-1.jpg','images/cellular-2.jpg','images/cellular-3.jpg','images/cellular-4.jpg'],
+        video:'videos/cellular-jail.mp4',audio_en:'audio/cellular-jail-en.mp3',audio_hi:'audio/cellular-jail-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Cellular+Jail+Port+Blair'
+      },
+      {slug:'flag-point',title_en:'Flag Point (Netaji Tricolor Site)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Historic site where Netaji hoisted the tricolor in 1943.',
+        facts:['Easy','City landmark'],
+        images:['images/flag-point-1.jpg','images/flag-point-2.jpg','images/flag-point-3.jpg','images/flag-point-4.jpg'],
+        video:'videos/flag-point.mp4',audio_en:'audio/flag-point-en.mp3',audio_hi:'audio/flag-point-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Flag+Point+Port+Blair'
+      },
+      {slug:'ross-island',title_en:'Ross Island / Netaji Subhas Chandra Bose Island',block:'Port Blair',district:'South Andaman',
+        overview_en:'Ruins, deer, and colonial history—short boat from PB.',
+        facts:['Boat ride','1–2 hrs'],
+        images:['images/ross-1.jpg','images/ross-2.jpg','images/ross-3.jpg','images/ross-4.jpg'],
+        video:'videos/ross-island.mp4',audio_en:'audio/ross-island-en.mp3',audio_hi:'audio/ross-island-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Ross+Island+Port+Blair'
+      },
+      {slug:'viper-island',title_en:'Viper Island',block:'Port Blair',district:'South Andaman',
+        overview_en:'Old jail ruins on a small island; quiet and historic.',
+        facts:['Boat ride'],
+        images:['images/viper-1.jpg','images/viper-2.jpg','images/viper-3.jpg','images/viper-4.jpg'],
+        video:'videos/viper-island.mp4',audio_en:'audio/viper-island-en.mp3',audio_hi:'audio/viper-island-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Viper+Island+Andaman'
+      },
+      {slug:'gandhi-park',title_en:'Gandhi Park (Japanese Water Tank)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Leisure park with WWII Japanese water tank.',
+        facts:['Easy','Family'],
+        images:['images/gandhi-park-1.jpg','images/gandhi-park-2.jpg','images/gandhi-park-3.jpg','images/gandhi-park-4.jpg'],
+        video:'videos/gandhi-park.mp4',audio_en:'audio/gandhi-park-en.mp3',audio_hi:'audio/gandhi-park-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Gandhi+Park+Port+Blair'
+      },
+      {slug:'japanese-bunkers',title_en:'Japanese Bunkers (WWII)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Scattered wartime bunkers near beaches and hills.',
+        facts:['Historic','Photo stops'],
+        images:['images/japanese-bunkers-1.jpg','images/japanese-bunkers-2.jpg','images/japanese-bunkers-3.jpg','images/japanese-bunkers-4.jpg'],
+        video:'videos/japanese-bunkers.mp4',audio_en:'audio/japanese-bunkers-en.mp3',audio_hi:'audio/japanese-bunkers-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Japanese+Bunkers+Andaman'
+      },
+      {slug:'chatham-saw-mill',title_en:'Chatham Saw Mill & Museum',block:'Port Blair',district:'South Andaman',
+        overview_en:"One of Asia's oldest saw mills; museum and historic bridge.",
+        facts:['Tickets','Guided'],
+        images:['images/chatham-1.jpg','images/chatham-2.jpg','images/chatham-3.jpg','images/chatham-4.jpg'],
+        video:'videos/chatham.mp4',audio_en:'audio/chatham-en.mp3',audio_hi:'audio/chatham-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Chatham+Saw+Mill'
+      },
+      {slug:'anthropological-museum',title_en:'Anthropological Museum',block:'Port Blair',district:'South Andaman',
+        overview_en:'Exhibits on tribes and island cultures.',
+        facts:['Museum','Tickets'],
+        images:['images/anthropological-1.jpg','images/anthropological-2.jpg','images/anthropological-3.jpg','images/anthropological-4.jpg'],
+        video:'videos/anthropological.mp4',audio_en:'audio/anthropological-en.mp3',audio_hi:'audio/anthropological-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Anthropological+Museum+Port+Blair'
+      },
+      {slug:'samudrika-museum',title_en:'Samudrika Naval Marine Museum',block:'Port Blair',district:'South Andaman',
+        overview_en:'Marine life, shells, and history of Andamans.',
+        facts:['Museum','Tickets'],
+        images:['images/samudrika-1.jpg','images/samudrika-2.jpg','images/samudrika-3.jpg','images/samudrika-4.jpg'],
+        video:'videos/samudrika.mp4',audio_en:'audio/samudrika-en.mp3',audio_hi:'audio/samudrika-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Samudrika+Naval+Marine+Museum'
+      },
+      {slug:'murugan-temple',title_en:'Sri Vetrimalai Murugan Temple',block:'Port Blair',district:'South Andaman',
+        overview_en:'Colorful hill temple with island views.',
+        facts:['Temple','Cultural'],
+        images:['images/murugan-1.jpg','images/murugan-2.jpg','images/murugan-3.jpg','images/murugan-4.jpg'],
+        video:'videos/murugan.mp4',audio_en:'audio/murugan-en.mp3',audio_hi:'audio/murugan-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Sri+Vetrimalai+Murugan+Temple+Port+Blair'
+      }
+    ],
+
+    /* Food & Lifestyle */
+    food:[
+      {slug:'aberdeen-bazaar',title_en:'Aberdeen Bazaar (Street Food & Shopping)',block:'Port Blair',district:'South Andaman',
+        overview_en:'Evening street snacks, tea, and local shopping.',
+        facts:['Evening','Crowded'],
+        images:['images/aberdeen-1.jpg','images/aberdeen-2.jpg','images/aberdeen-3.jpg','images/aberdeen-4.jpg'],
+        video:'videos/aberdeen.mp4',audio_en:'audio/aberdeen-en.mp3',audio_hi:'audio/aberdeen-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Aberdeen+Bazaar+Port+Blair'
+      },
+      {slug:'seafood-thali',title_en:'Seafood Thalis & Local Kitchens',block:'Port Blair & Islands',district:'South Andaman',
+        overview_en:'Fish curry, lobsters, crab masala—ask homestays and dhabas.',
+        facts:['Popular','Local flavors'],
+        images:['images/seafood-1.jpg','images/seafood-2.jpg','images/seafood-3.jpg','images/seafood-4.jpg'],
+        video:'videos/seafood.mp4',audio_en:'audio/seafood-en.mp3',audio_hi:'audio/seafood-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Seafood+thali+Port+Blair'
+      },
+      {slug:'beach-dhabas-havelock',title_en:'Beachside Dhabas (Havelock)',block:'Havelock (Swaraj Dweep)',district:'South Andaman',
+        overview_en:'Casual seafood shacks near lagoon beaches.',
+        facts:['Budget','Fresh catch'],
+        images:['images/havelock-dhaba-1.jpg','images/havelock-dhaba-2.jpg','images/havelock-dhaba-3.jpg','images/havelock-dhaba-4.jpg'],
+        video:'videos/havelock-dhaba.mp4',audio_en:'audio/havelock-dhaba-en.mp3',audio_hi:'audio/havelock-dhaba-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Havelock+beach+dhaba'
+      },
+      {slug:'homestay-meals-neil',title_en:'Homestay Meals (Neil)',block:'Neil Island (Shaheed Dweep)',district:'South Andaman',
+        overview_en:'Village kitchens offering simple, authentic island meals.',
+        facts:['Local','By request'],
+        images:['images/neil-meals-1.jpg','images/neil-meals-2.jpg','images/neil-meals-3.jpg','images/neil-meals-4.jpg'],
+        video:'videos/neil-meals.mp4',audio_en:'audio/neil-meals-en.mp3',audio_hi:'audio/neil-meals-hi.mp3',
+        maps_url:'https://www.google.com/maps/search/Neil+Island+homestay+food'
+      }
+    ]
+  },
+  /* placeholders for expansion */
+  north:{hidden:[],culture:[],food:[]},
+  nicobar:{hidden:[],culture:[],food:[]}
+};
+
+/* ================== STATE ================== */
+let currentDistrict='south';
+let currentCategory='hidden';
+let currentDetail=null;
+let currentAudio=null;
+let searchQuery='';
+
+/* ================== RENDER LIST ================== */
+function setDistrict(d){
+  currentDistrict=d;
+  ['dist-south','dist-north','dist-nic'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(d==='south'?'dist-south':d==='north'?'dist-north':'dist-nic').classList.add('active');
+  document.getElementById('heroTitle').textContent =
+    d==='south' ? 'Discover South Andaman' :
+    d==='north' ? 'Discover North & Middle Andaman' : 'Discover Nicobar';
+  document.getElementById('detail').hidden=true;
+  showList(currentCategory);
+}
+
+function showList(cat){
+  currentCategory=cat;
+  ['cat-hidden','cat-culture','cat-food'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(cat==='hidden'?'cat-hidden':cat==='culture'?'cat-culture':'cat-food').classList.add('active');
+
+  const all=((DATASETS[currentDistrict]||{})[cat])||[];
+  const q=searchQuery.trim().toLowerCase();
+  const items= q ? all.filter(it=>{
+    const hay=(it.title_en+' '+(it.block||'')+' '+(it.overview_en||'')).toLowerCase();
+    return hay.includes(q);
+  }) : all;
+
+  const listEl=document.getElementById('list'); listEl.innerHTML='';
+  document.getElementById('searchCount').textContent = q ? `${items.length} found` : '';
+
+  if(!items.length){
+    listEl.innerHTML = `<div class="card reveal"><div class="body"><div class="title2">No results</div><div class="meta">Try another keyword or clear search.</div></div></div>`;
+    return;
+  }
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('reveal');io.unobserve(e.target);}})},{threshold:.12});
+
+  items.forEach(item=>{
+    const img=(item.images && item.images[0]) || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%221280%22 height=%22720%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%230b1324%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22white%22 font-size=%2224%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>No image</text></svg>';
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <div class="thumb" style="background-image:url('${img}')"></div>
+      <div class="body">
+        <div class="kicker">${item.block||''} ${item.district?('· '+item.district):''}</div>
+        <div class="title2">${item.title_en||'Untitled'}</div>
+        <div class="meta">${item.overview_en||''}</div>
+        <div class="actions">
+          <button class="btn primary" onclick="openDetail('${item.slug}','${currentCategory}')">View Details</button>
+          ${item.maps_url?`<a class="btn" href="${item.maps_url}" target="_blank" rel="noopener">Open in Google Maps</a>`:''}
+        </div>
+      </div>`;
+    listEl.appendChild(card);
+    io.observe(card);
+  });
+}
+
+/* ================== DETAIL (ONE guide only) ================== */
+function openDetail(slug,cat){
+  const items=((DATASETS[currentDistrict]||{})[cat])||[];
+  const item=items.find(x=>x.slug===slug); if(!item) return;
+  currentDetail=item;
+  if(currentAudio){try{currentAudio.pause();}catch(e){} currentAudio=null;}
+
+  // prefer item.guides; fall back by area; enforce 1
+  let guidesList = Array.isArray(item.guides) && item.guides.length ? item.guides : (GUIDE_INDEX[item.block] || []);
+  guidesList = guidesList.slice(0,1);
+
+  const d=document.getElementById('detail');
+  const facts=(item.facts||[]).map(f=>`<span class="fact">${f}</span>`).join('');
+  const images=(item.images||[]).map(src=>`<img src="${src}" alt="${item.title_en}" style="width:100%;border-radius:12px;border:1px solid var(--muted);margin-top:10px">`).join('');
+
+  // video with loader
+  const vidId = `vid-${item.slug}`;
+  const loaderId = `loader-${item.slug}`;
+  const video = item.video ? `
+    <div class="videoWrap" style="margin-top:12px;border:1px solid var(--muted);border-radius:12px;overflow:hidden">
+      <div id="${loaderId}" class="loader"><div class="spinner" aria-label="Loading video"></div></div>
+      <video id="${vidId}" controls preload="metadata" poster="${item.images?.[0]||''}" style="width:100%;display:block">
+        <source src="${item.video}" type="video/mp4">
+      </video>
+    </div>` : '';
+
+  const guidesHtml = guidesList.map(g=>`
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--muted);border-radius:14px;background:#0f1a2b;margin-top:10px">
+      <div style="width:48px;height:48px;border-radius:12px;background:conic-gradient(from 0deg,#16b39a,#f97316,#ffcf8a,#16b39a);display:grid;place-items:center;color:#0b1220;font-weight:800">${(g.name||'?')[0]}</div>
+      <div style="flex:1">
+        <div style="font-weight:700">${g.name||'Local Guide'} — ${g.area||item.block||''}</div>
+        <div class="meta">${g.spec||'Tours'} · ${(g.langs||['EN','HI']).join('/')}</div>
+        ${g.phone?`<div class="actions"><a class="btn primary" href="tel:${g.phone}">Call</a></div>`:''}
+      </div>
+    </div>`).join('');
+
+  d.innerHTML=`
+    <div class="heroMedia" style="background-image:url('${item.images?.[0]||''}')"></div>
+    <h2 style="margin:12px 0 6px">${item.title_en||''}</h2>
+    <div class="kicker">${item.block||''} ${item.district?('· '+item.district):''}</div>
+    <div class="facts">${facts}</div>
+    <p style="margin:10px 0">${item.overview_en||''}</p>
+    ${item.history_en?`<h3 style="margin:18px 0 6px">History</h3><p>${item.history_en}</p>`:''}
+    <div class="listenBar">
+      <button id="listenBtn" class="btn accent listenBtn attract" onclick="openSheet()">
+        Listen <span class="eq" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
+      </button>
+      <div class="progress"><i id="prog"></i></div>
+    </div>
+    <h3 style="margin:18px 0 8px">Gallery & Video</h3>
+    ${images}
+    ${video}
+    <h3 style="margin:18px 0 6px">Map & Directions</h3>
+    <div style="aspect-ratio:3/2;background:#0b1324;border:1px solid var(--muted);border-radius:var(--radius)"></div>
+    <div class="actions" style="margin-top:10px">
+      ${item.maps_url?`<a class="btn primary" href="${item.maps_url}" target="_blank" rel="noopener">Open in Google Maps</a>`:''}
+      ${item.plus_code?`<button class="btn" onclick="navigator.clipboard.writeText('${item.plus_code}').then(()=>alert('Copied: ${item.plus_code}'))">Copy Plus Code</button>`:''}
+    </div>
+    ${guidesList.length?`<h3 style="margin:18px 0 6px">Local Guide</h3>`:''}
+    ${guidesHtml}
+    ${item.safety?.length?`<h3 style="margin:18px 0 6px">Safety & Tips</h3><ul>`:''}
+    ${item.safety?.map(s=>`<li style='color:#cfd8e6'>${s}</li>`).join('')}
+    ${item.safety?.length?`</ul>`:''}
+  `;
+  d.hidden=false; d.scrollIntoView({behavior:'smooth'});
+
+  // loader hooks
+  const videoEl = document.getElementById(vidId);
+  const loaderEl = document.getElementById(loaderId);
+  if(videoEl && loaderEl){
+    const hideLoader = ()=> loaderEl.style.display='none';
+    const showLoader = ()=> loaderEl.style.display='grid';
+    showLoader();
+    videoEl.addEventListener('loadeddata', hideLoader, {once:true});
+    videoEl.addEventListener('canplay', hideLoader);
+    videoEl.addEventListener('playing', hideLoader);
+    videoEl.addEventListener('waiting', showLoader);
+    videoEl.addEventListener('stalled', showLoader);
+    videoEl.addEventListener('error', ()=>{ loaderEl.innerHTML='<div style="color:#fff;padding:8px 12px;background:rgba(0,0,0,.35);border-radius:10px">Video failed to load</div>'; });
+  }
+}
+
+/* ================== LISTEN CONTROLS ================== */
+function openSheet(){
+  document.getElementById('listenBtn')?.classList.remove('attract');
+  const sheet=document.getElementById('sheet'); sheet.classList.add('open'); sheet.setAttribute('aria-hidden','false');
+}
+function closeSheet(){
+  const sheet=document.getElementById('sheet'); sheet.classList.remove('open'); sheet.setAttribute('aria-hidden','true');
+}
+function playLang(lang){
+  closeSheet();
+  if(!currentDetail){alert('Open a location first');return;}
+  const src=(lang==='hi')?currentDetail.audio_hi:currentDetail.audio_en;
+  if(!src){alert('No audio available for this language');return;}
+
+  if(currentAudio){try{currentAudio.pause();}catch(e){}}
+  currentAudio = new Audio(src);
+  currentAudio.preload='metadata';
+  currentAudio.playsInline=true;
+
+  const btn=document.getElementById('listenBtn');
+  const prog=document.getElementById('prog');
+  btn?.classList.add('playing'); prog.style.width='0%';
+
+  currentAudio.ontimeupdate=()=>{
+    if(!isFinite(currentAudio.duration)||currentAudio.duration===0) return;
+    prog.style.width = Math.min(100,(currentAudio.currentTime/currentAudio.duration)*100)+'%';
+  };
+  currentAudio.onended=()=>{ prog.style.width='0%'; btn?.classList.remove('playing'); btn?.classList.add('attract'); };
+  currentAudio.onerror=()=>{ alert('Audio failed to load'); btn?.classList.remove('playing'); };
+  currentAudio.play().catch(()=>alert('Tap to allow audio playback on this device.'));
+}
+
+/* ================== BOOT ================== */
+window.addEventListener('DOMContentLoaded', ()=>{
+  // redirect old anchors to new pages
+  const hash = location.hash.replace('#','');
+  if(['become-guide','contact','about'].includes(hash)){
+    location.href = (hash==='become-guide'?'become-guide':hash)+'.html';
+    return;
+  }
+
+  // District tabs
+  document.getElementById('dist-south').onclick=()=>setDistrict('south');
+  document.getElementById('dist-north').onclick=()=>setDistrict('north');
+  document.getElementById('dist-nic').onclick=()=>setDistrict('nicobar');
+
+  // Category tabs
+  document.getElementById('cat-hidden').onclick=()=>showList('hidden');
+  document.getElementById('cat-culture').onclick=()=>showList('culture');
+  document.getElementById('cat-food').onclick=()=>showList('food');
+
+  // Search
+  const s = document.getElementById('search');
+  let t=null;
+  s.addEventListener('input', e=>{
+    clearTimeout(t);
+    t=setTimeout(()=>{ searchQuery = e.target.value || ''; showList(currentCategory); }, 180);
+  });
+
+  setDistrict('south');
+  showList('hidden');
+});
+</script>
+<!-- ================= Horizon AI widget — INSERT BEFORE </body> ================= -->
+<style>
+/* Horizon AI floating panel */
+#horizonWidget{position:fixed;bottom:20px;right:20px;width:380px;max-height:78vh;background:#071025;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;z-index:9999;font-family:Inter,system-ui;color:#eaf6f1}
+#horizonHeader{padding:12px 14px;font-weight:800;color:#e6fff7;background:linear-gradient(90deg,#163e3a,#1e7b6e)}
+#quickIdeas{display:flex;gap:8px;padding:10px;overflow:auto}
+.quickBtn{flex:0 0 auto;background:#0f2a3b;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:13px;color:#dff6f0}
+#messages{flex:1;padding:12px;overflow:auto}
+.msg{margin:8px 0;padding:10px 12px;border-radius:12px;max-width:82%}
+.msg.bot{background:#0e2330}
+.msg.user{background:#16B39A;color:#042a25;margin-left:auto}
+#compose{display:flex;padding:10px;background:#08121a;border-top:1px solid rgba(255,255,255,.02)}
+#compose input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.03);background:transparent;color:#eaf6f1}
+#compose button{margin-left:8px;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(90deg,#16B39A,#119681);color:#042a25;cursor:pointer}
+</style>
+
+<div id="horizonWidget" aria-hidden="false">
+  <div id="horizonHeader">🌅 Horizon AI — Travel Companion</div>
+  <div id="quickIdeas">
+    <div class="quickBtn">Best hidden beaches</div>
+    <div class="quickBtn">Photography spots</div>
+    <div class="quickBtn">3-day itinerary</div>
+  </div>
+  <div id="messages">
+    <div class="msg bot">Hello — I’m Horizon AI, your travel companion for the Andaman Islands. Ask me about places, itineraries, or local tips.</div>
+  </div>
+  <div id="compose">
+    <input id="aiInput" placeholder="Ask about Andaman adventures…" />
+    <button id="aiSend" aria-label="Send">➤</button>
+  </div>
+</div>
+
+<script>
+/* Simple widget logic — posts to Netlify function /.netlify/functions/chat */
+const msgs = document.getElementById('messages');
+
+function addMsg(text, cls='bot') {
+  const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function callChatAPI(message) {
+  const url = '/.netlify/functions/chat';
+  const resp = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ message })
+  });
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error(txt || resp.statusText);
+  }
+  const j = await resp.json();
+  return j.reply || '';
+}
+
+document.querySelectorAll('.quickBtn').forEach(b => b.addEventListener('click', () => {
+  const text = b.textContent.trim();
+  sendMessage(text);
+}));
+
+document.getElementById('aiSend').addEventListener('click', () => {
+  const v = document.getElementById('aiInput').value.trim();
+  if (!v) return;
+  sendMessage(v); document.getElementById('aiInput').value = '';
+});
+document.getElementById('aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('aiSend').click(); });
+
+async function sendMessage(text){
+  addMsg(text,'user');
+  const thinking = document.createElement('div'); thinking.className='msg bot'; thinking.textContent='…'; msgs.appendChild(thinking); msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const reply = await callChatAPI(text);
+    thinking.textContent = reply || '[no reply]';
+  } catch (err) {
+    thinking.textContent = 'Error: ' + (err.message || err);
+  }
+}
+</script>
+<!-- ================= end Horizon AI widget ================= -->
+
+</body>
+</html>
+

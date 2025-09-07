@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Contact — Hidden Horizons</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{--navy:#0C1426;--muted:#1E3353;--text:#F5F7FB;--sub:#BFCAE0;--primary:#16B39A;--primary-2:#119681;--accent:#F97316;--shadow:0 16px 44px rgba(6,13,30,.35);--radius:18px}
+  *{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0A1222 0%, #0C1426 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:60;background:rgba(12,20,38,.92);backdrop-filter:blur(12px);border-bottom:1px solid #15243d}
+  .container{max-width:1160px;margin:0 auto;padding:14px 16px}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;flex-direction:column}.brand .name{font-weight:800}.brand .tag{color:#BFCAE0;font-size:12.5px}
+  .menu{display:flex;gap:8px}.menu a{padding:8px 12px;border:1px solid transparent;border-radius:12px}.menu a:hover{border-color:#254065;background:#0f1a2b}
+  .hero{min-height:160px;display:grid;place-items:center;text-align:center;background:#101c34}
+  .cardForm{max-width:780px;margin:18px auto 28px;padding:16px;border:1px solid var(--muted);background:#0E1A2F;border-radius:var(--radius);box-shadow:var(--shadow)}
+  label{display:block;font-size:13px;color:#cfe0ff;margin:6px 0 4px}
+  input,textarea{width:100%;background:#0f1b31;border:1px solid var(--muted);color:#e8f2ff;border-radius:12px;padding:10px 12px}
+  textarea{min-height:120px}
+  .btn{border:1px solid var(--muted);background:#11203a;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary-2));border-color:var(--primary);color:#052825}
+  footer{margin:36px 0 16px;color:#BFCAE0;text-align:center;padding:10px}
+  .toast{position:fixed;right:16px;bottom:16px;padding:12px 14px;border-radius:12px;background:#0f1b31;border:1px solid #23406a;color:#e8f2ff;box-shadow:var(--shadow);display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand"><span class="name">Hidden Horizons Guide</span><span class="tag">Discover hidden places, culture & food with local guides</span></div>
+    <nav class="menu">
+      <a href="index.html">Explore</a>
+      <a href="become-guide.html">Become a Guide</a>
+      <a href="contact.html">Contact</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero"><h1>Contact Us</h1></section>
+
+<div class="cardForm">
+  <form id="contactForm">
+    <label for="name">Name</label><input id="name" name="name" required>
+    <label for="email">Email</label><input id="email" name="email" type="email" required>
+    <label for="msg">Message</label><textarea id="msg" name="message" required placeholder="How can we help?"></textarea>
+    <input type="hidden" name="access_key" value="afc77fa9-3af5-41cf-8244-46281f580f91">
+    <input type="hidden" name="subject" value="Hidden Horizons — Contact">
+    <div style="margin-top:10px"><button class="btn primary" type="submit">Send</button></div>
+  </form>
+  <p style="color:#9fb5d6;margin-top:10px">Or email: support@hiddenhorizons.example</p>
+</div>
+
+<footer>© 2025 Hidden Horizons Guide · Developed by DBRAIT Students</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none'},3000)}
+document.getElementById('contactForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  try{
+    const res = await fetch('https://api.web3forms.com/submit',{method:'POST',body:new FormData(e.target)});
+    toast(res.ok?'Message sent! We\'ll reply soon.':'Failed to send. Try again later.');
+    if(res.ok) e.target.reset();
+  }catch(err){ toast('Network error. Please try again.'); }
+});
+</script>
+</body>
+</html>
