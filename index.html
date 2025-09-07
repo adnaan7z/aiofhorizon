@@ -694,69 +694,248 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #compose button{margin-left:8px;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(90deg,#16B39A,#119681);color:#042a25;cursor:pointer}
 </style>
 
-<div id="horizonWidget" aria-hidden="false">
-  <div id="horizonHeader">🌅 Horizon AI — Travel Companion</div>
-  <div id="quickIdeas">
-    <div class="quickBtn">Best hidden beaches</div>
-    <div class="quickBtn">Photography spots</div>
-    <div class="quickBtn">3-day itinerary</div>
-  </div>
-  <div id="messages">
-    <div class="msg bot">Hello — I’m Horizon AI, your travel companion for the Andaman Islands. Ask me about places, itineraries, or local tips.</div>
-  </div>
-  <div id="compose">
-    <input id="aiInput" placeholder="Ask about Andaman adventures…" />
-    <button id="aiSend" aria-label="Send">➤</button>
+<!-- ========== Horizon AI Floating Chat (paste just before </body>) ========== -->
+<style>
+/* Floating button + panel styles (uses your :root variables) */
+.hzai-float {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* round button */
+.hzai-btn {
+  width:56px;height:56px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(180deg,var(--primary),var(--primary-2));
+  color:#052825;font-weight:700;border:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);
+  cursor:pointer; transition: transform .18s ease, box-shadow .18s ease;
+}
+.hzai-btn:active{ transform: scale(.96) }
+.hzai-btn .icon { font-size:20px; }
+
+/* the panel */
+.hzai-panel {
+  width: 360px;
+  max-width: calc(100vw - 36px);
+  height: 520px;
+  max-height: calc(100vh - 110px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(6,12,24,.95), rgba(10,18,32,0.98));
+  color: var(--text);
+  box-shadow: 0 14px 44px rgba(3,8,20,.6);
+  transform-origin: bottom right;
+  transform: translateY(18px) scale(.9);
+  opacity: 0;
+  transition: transform .28s cubic-bezier(.2,.9,.3,1), opacity .22s;
+  display:flex;flex-direction:column;
+}
+
+/* show */
+.hzai-panel.open { transform: translateY(0) scale(1); opacity: 1; }
+
+/* panel header */
+.hzai-header {
+  background: linear-gradient(90deg,#08202d,#0f3640);
+  padding:12px 14px; display:flex; gap:10px; align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.hzai-header .title { font-weight:700; font-size:15px }
+.hzai-header .sub { font-size:12px; color:var(--sub) }
+
+/* quick chips */
+.hzai-chips { padding:10px; display:flex; gap:8px; overflow-x:auto; }
+.hzai-chip { flex:0 0 auto; background:#0e2a34;color:#bfece4;border-radius:999px;padding:8px 10px;font-size:13px;cursor:pointer;border:1px solid rgba(255,255,255,.03); }
+
+/* messages area */
+.hzai-messages {
+  flex:1; padding:12px; overflow:auto; display:flex; flex-direction:column; gap:12px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+.hzai-bubble {
+  max-width:78%; padding:10px 12px; border-radius:12px; font-size:14px; line-height:1.35;
+  box-shadow: 0 6px 18px rgba(0,0,0,.24);
+}
+.hzai-bot { background: linear-gradient(180deg,var(--accent),var(--primary)); color:#2b1203; align-self:flex-start; border-radius:12px 12px 12px 4px; }
+.hzai-user { background:#0d1a2b; color:var(--text); align-self:flex-end; border-radius:12px 12px 4px 12px; }
+
+/* input bar */
+.hzai-inputwrap { display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,.02); background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); }
+.hzai-input { flex:1; padding:10px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.04); background:transparent; color:var(--text); outline:none; font-size:14px; }
+.hzai-send { width:44px;height:44px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary-2),var(--primary)); display:grid;place-items:center;color:#052825;cursor:pointer; }
+
+/* small responsive */
+@media (max-width:480px){
+  .hzai-panel { width: 92vw; height: 68vh; right: 8px; bottom: 72px; }
+  .hzai-btn { width:52px;height:52px }
+}
+</style>
+
+<div class="hzai-float" id="hzai-root" aria-live="polite">
+  <button id="hzai-btn" class="hzai-btn" aria-label="Open Horizon AI chat">
+    <span class="icon">💬</span>
+  </button>
+
+  <div id="hzai-panel" class="hzai-panel" role="dialog" aria-hidden="true" aria-label="Horizon AI chat panel">
+    <div class="hzai-header">
+      <div style="display:flex;flex-direction:column">
+        <div class="title">Horizon AI — Travel Companion</div>
+        <div class="sub">Your intelligent Andaman travel helper</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button id="hzai-close" title="Close" class="hzai-btn" style="width:36px;height:36px;border-radius:10px;font-size:14px">✕</button>
+      </div>
+    </div>
+
+    <div class="hzai-chips" id="hzai-chips" aria-hidden="false">
+      <button class="hzai-chip">Best hidden beaches</button>
+      <button class="hzai-chip">Photography spots</button>
+      <button class="hzai-chip">3-day itinerary</button>
+      <button class="hzai-chip">Local food tips</button>
+    </div>
+
+    <div class="hzai-messages" id="hzai-messages" role="log" aria-live="polite">
+      <!-- messages injected here -->
+      <div class="hzai-bubble hzai-bot">Hello — I'm Horizon AI, your travel companion for the Andaman Islands. Ask me about places, itineraries or local tips.</div>
+    </div>
+
+    <div class="hzai-inputwrap">
+      <input id="hzai-input" class="hzai-input" placeholder="Ask me about Andaman adventures..." aria-label="Ask Horizon AI" />
+      <button id="hzai-send" class="hzai-send" aria-label="Send message">➤</button>
+    </div>
   </div>
 </div>
 
 <script>
-/* Simple widget logic — posts to Netlify function /.netlify/functions/chat */
-const msgs = document.getElementById('messages');
+(function(){
+  const API_ENDPOINT = '/.netlify/functions/chat'; // Netlify function endpoint
+  const root = document.getElementById('hzai-root');
+  const btn = document.getElementById('hzai-btn');
+  const panel = document.getElementById('hzai-panel');
+  const closeBtn = document.getElementById('hzai-close');
+  const sendBtn = document.getElementById('hzai-send');
+  const input = document.getElementById('hzai-input');
+  const messagesWrap = document.getElementById('hzai-messages');
+  const chips = document.getElementById('hzai-chips');
 
-function addMsg(text, cls='bot') {
-  const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
-}
+  let open = false;
+  const setOpen = (v) => {
+    open = !!v;
+    if(open){
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden','false');
+      // focus input after open
+      setTimeout(()=>input.focus(),160);
+    } else {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden','true');
+    }
+  };
 
-async function callChatAPI(message) {
-  const url = '/.netlify/functions/chat';
-  const resp = await fetch(url, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ message })
+  btn.addEventListener('click', ()=> setOpen(!open));
+  closeBtn.addEventListener('click', ()=> setOpen(false));
+
+  // clicking chip sends quick question
+  chips.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.hzai-chip');
+    if(!btn) return;
+    const q = btn.textContent.trim();
+    input.value = q;
+    sendMessage(q);
   });
-  if (!resp.ok) {
-    const txt = await resp.text();
-    throw new Error(txt || resp.statusText);
+
+  // send by button or Enter
+  sendBtn.addEventListener('click', ()=> sendMessage());
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault(); sendMessage();
+    }
+  });
+
+  function appendBubble(text, cls='hzai-bot'){
+    const el = document.createElement('div');
+    el.className = 'hzai-bubble ' + cls;
+    el.textContent = text;
+    messagesWrap.appendChild(el);
+    // scroll to bottom
+    setTimeout(()=> messagesWrap.scrollTop = messagesWrap.scrollHeight, 40);
   }
-  const j = await resp.json();
-  return j.reply || '';
-}
 
-document.querySelectorAll('.quickBtn').forEach(b => b.addEventListener('click', () => {
-  const text = b.textContent.trim();
-  sendMessage(text);
-}));
+  let pending = false;
+  async function sendMessage(forcedText){
+    if(pending) return; // simple lock
+    const text = (forcedText !== undefined ? forcedText : input.value || '').toString().trim();
+    if(!text) return;
+    // show user bubble
+    appendBubble(text, 'hzai-user');
+    input.value = '';
+    // show loading bubble (temporary)
+    const loading = document.createElement('div');
+    loading.className = 'hzai-bubble hzai-bot';
+    loading.textContent = 'Thinking…';
+    messagesWrap.appendChild(loading);
+    messagesWrap.scrollTop = messagesWrap.scrollHeight;
+    pending = true;
 
-document.getElementById('aiSend').addEventListener('click', () => {
-  const v = document.getElementById('aiInput').value.trim();
-  if (!v) return;
-  sendMessage(v); document.getElementById('aiInput').value = '';
-});
-document.getElementById('aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('aiSend').click(); });
-
-async function sendMessage(text){
-  addMsg(text,'user');
-  const thinking = document.createElement('div'); thinking.className='msg bot'; thinking.textContent='…'; msgs.appendChild(thinking); msgs.scrollTop = msgs.scrollHeight;
-  try {
-    const reply = await callChatAPI(text);
-    thinking.textContent = reply || '[no reply]';
-  } catch (err) {
-    thinking.textContent = 'Error: ' + (err.message || err);
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      if(!res.ok){
+        throw new Error(`Server ${res.status} ${res.statusText}`);
+      }
+      const data = await res.json();
+      const reply = (data && data.reply) ? data.reply : 'Sorry — no response available.';
+      loading.remove();
+      appendBubble(reply, 'hzai-bot');
+    } catch(err){
+      loading.remove();
+      appendBubble('Error: '+ (err.message || 'Request failed'), 'hzai-bot');
+      console.error('Horizon AI error:', err);
+    } finally {
+      pending = false;
+      messagesWrap.scrollTop = messagesWrap.scrollHeight;
+    }
   }
-}
+
+  // graceful keyboard: ESC closes panel
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') setOpen(false); });
+
+  // small drag support: allow moving button if user wants (optional)
+  (function() {
+    let dragging = false, startX=0,startY=0, origRight=18, origBottom=18;
+    const handle = btn;
+    handle.addEventListener('pointerdown', (ev)=>{
+      if(open) return; // only move when closed
+      dragging = true;
+      startX = ev.clientX; startY = ev.clientY;
+      const style = getComputedStyle(root);
+      origRight = parseFloat(style.right) || 18;
+      origBottom = parseFloat(style.bottom) || 18;
+      handle.setPointerCapture(ev.pointerId);
+    });
+    window.addEventListener('pointermove', (ev)=>{
+      if(!dragging) return;
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      // update position
+      root.style.right = Math.max(8, origRight - dx) + 'px';
+      root.style.bottom = Math.max(8, origBottom - dy) + 'px';
+    });
+    window.addEventListener('pointerup', ()=>{ dragging=false; });
+  })();
+
+})();
 </script>
-<!-- ================= end Horizon AI widget ================= -->
+<!-- ========== END Horizon AI Floating Chat ========== -->
+
 
 </body>
 </html>
