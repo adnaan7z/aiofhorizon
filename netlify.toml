@@ -1,3 +1,5 @@
 [build]
-  publish = "index"
+  # publish from repository root
+  publish = "."
+  # serverless functions dir relative to repo root
   functions = "netlify/functions"
