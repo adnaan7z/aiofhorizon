@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hidden Horizons — Reviews</title>
+<style>
+  body{font-family:Inter,system-ui,Arial; background:#f5f7fb; color:#0b1220; padding:24px}
+  .card{max-width:780px;margin:18px auto;background:#fff;border-radius:10px;padding:18px;border:1px solid #e6ecf3;box-shadow:0 6px 20px rgba(10,20,40,.05)}
+  h1{margin:0 0 12px;font-size:20px}
+  form .row{margin-bottom:10px}
+  input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #d7e1ef;font-size:14px}
+  button{background:#0a84ff;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+  .msg{margin-top:12px}
+  .reviews{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+  .review-item{border-top:1px dashed #e6edf8;padding-top:12px}
+  .meta{font-size:13px;color:#425b7a;margin-bottom:6px}
+  .rating{color:#f5a623;font-weight:700}
+  .small{font-size:13px;color:#718096}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Leave a Review</h1>
+
+  <form id="reviewForm" autocomplete="off">
+    <div class="row">
+      <input id="name" placeholder="Your name" required />
+    </div>
+    <div class="row">
+      <input id="email" type="email" placeholder="Email (optional)" />
+    </div>
+    <div class="row">
+      <select id="rating" required>
+        <option value="">Select rating</option>
+        <option value="5">★★★★★ 5</option>
+        <option value="4">★★★★ 4</option>
+        <option value="3">★★★ 3</option>
+        <option value="2">★★ 2</option>
+        <option value="1">★ 1</option>
+      </select>
+    </div>
+    <div class="row">
+      <input id="place" placeholder="Place / area (e.g. Port Blair)" />
+    </div>
+    <div class="row">
+      <textarea id="comment" rows="4" placeholder="Write your review…" required></textarea>
+    </div>
+
+    <div class="row">
+      <button type="submit">Submit Review</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <hr style="margin:18px 0">
+
+  <div>
+    <h2 style="margin:0 0 8px">All Reviews</h2>
+    <div class="small">Loaded from the shared Google Sheet</div>
+    <div id="reviews" class="reviews">Loading…</div>
+  </div>
+</div>
+
+<script>
+/* -------------- CONFIG — update these -------------- */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwODU40nn0a9HxYIJMZMBsqTsPsahP0c6flW1-sDYLgvMHDYr3q6ZYUJp7XFImaJ_XC/exec";
+// your Sheet ID (from sheet URL /d/<THIS>/edit)
+const SHEET_ID = "1bRMHBJOmg0OY0Ws3miGBuVvJOOwvZr16_RKBZC7cBuc";
+// the sheet (tab) name where rows are written
+const SHEET_NAME = "Sheet1"; // change if your tab is named "Hidden Horizons Reviews" etc
+/* -------------------------------------------------- */
+
+const form = document.getElementById('reviewForm');
+const msg = document.getElementById('msg');
+const reviewsEl = document.getElementById('reviews');
+
+function showMessage(html, ok = true){
+  msg.innerHTML = (ok ? "✅ " : "❌ ") + html;
+  msg.style.color = ok ? '#1b7a3d' : '#b02a2a';
+}
+
+// fetch reviews from public sheet using gviz JSON (no auth, public sheet required)
+async function loadReviews(){
+  reviewsEl.innerHTML = 'Loading…';
+  try {
+    // gviz endpoint returns callback-wrapped JSON; request out:json for simpler parse
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Sheet fetch failed: ' + res.status);
+    const text = await res.text();
+    // remove leading function wrapper: "/*O_o*/\ngoogle.visualization.Query.setResponse(...);"
+    const jsonText = text.replace(/^[^\(]*\(/, '').replace(/\);?$/, '');
+    const data = JSON.parse(jsonText);
+    const rows = (data.table.rows || []);
+    if(rows.length === 0){
+      reviewsEl.innerHTML = '<div class="small">No reviews yet.</div>';
+      return;
+    }
+
+    // assume header row is in first row of sheet (or columns mapping known)
+    // We'll map columns by index: A=name, B=rating, C=comment, D=ts, E=approved, F=adminNote
+    const html = rows.map(r=>{
+      const c = r.c;
+      const name = (c[0] && c[0].v) || 'Anonymous';
+      const rating = (c[1] && c[1].v) || '';
+      const comment = (c[2] && c[2].v) || '';
+      const ts = (c[3] && c[3].v) || '';
+      const approved = (c[4] && c[4].v) || '';
+      return `
+        <div class="review-item">
+          <div class="meta"><strong>${escapeHtml(name)}</strong> · <span class="rating">${'★'.repeat(parseInt(rating||0))}</span> <span class="small">${escapeHtml(ts)}</span></div>
+          <div>${escapeHtml(comment)}</div>
+          <div class="small" style="margin-top:6px">Approved: ${escapeHtml(String(approved||''))}</div>
+        </div>`;
+    }).join('');
+    reviewsEl.innerHTML = html;
+  } catch(err){
+    reviewsEl.innerHTML = '<div class="small">Failed to load reviews. Check sheet sharing and SHEET_ID.</div>';
+    console.error(err);
+  }
+}
+
+// simple html-escape
+function escapeHtml(s){
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+// POST to Apps Script web app
+form.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  showMessage('Submitting…', true);
+
+  const data = {
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    rating: document.getElementById('rating').value,
+    place: document.getElementById('place').value.trim(),
+    comment: document.getElementById('comment').value.trim()
+  };
+
+  // minimal validation
+  if(!data.name || !data.comment || !data.rating){
+    showMessage('Please enter name, rating and comment.', false);
+    return;
+  }
+
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    // apps script should reply with JSON {status: 'ok'} or similar
+    const json = await res.json().catch(()=>null);
+
+    if(res.ok && json && (json.status === 'ok' || json.result === 'Saved' || json.message)){
+      showMessage('Review submitted successfully!', true);
+      form.reset();
+      // re-load list from sheet (there may be a short delay before new row appears)
+      setTimeout(loadReviews, 1200);
+    } else {
+      // show server text if available
+      const text = json ? JSON.stringify(json) : await res.text();
+      showMessage('Server error: ' + (text || res.statusText), false);
+      console.error('Submit response', res.status, text);
+    }
+  } catch(err){
+    showMessage('Network error submitting review. See console.', false);
+    console.error(err);
+  }
+});
+
+// initial load
+loadReviews();
+</script>
+</body>
+</html>
