@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Visitor Reviews — Hidden Horizons</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A1222;
+    --card:#0E1A2F;
+    --muted:#BFCAE0;
+    --accent:#FAD6A5;
+    --glass: rgba(255,255,255,0.03);
+    --white: #EAF2FF;
+    --shadow: 0 10px 30px rgba(4,12,24,.55);
+  }
+
+  /* page */
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071022 0%,var(--bg) 100%);font-family:Inter,system-ui,Arial;color:var(--white);-webkit-font-smoothing:antialiased}
+  .page-wrap{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:56px 18px;box-sizing:border-box;animation:pageFade .6s ease both}
+
+  @keyframes pageFade{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:none}
+  }
+
+  /* container */
+  .wrap{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03));border-radius:14px;padding:26px 26px 36px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
+  h1{margin:0 0 10px;font-size:22px;color:#fff}
+  p.intro{margin:0 0 18px;color:var(--muted);font-size:14px}
+
+  /* reviews */
+  #reviews-list{display:flex;flex-direction:column;gap:14px;margin-top:12px}
+  .review{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));border-radius:12px;padding:14px;border:1px solid var(--glass);box-shadow:0 6px 20px rgba(2,8,18,.4);transform-origin:center;transition:transform .22s cubic-bezier(.2,.9,.3,1),box-shadow .22s;will-change:transform,opacity}
+  .review:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 22px 40px rgba(4,12,24,.6)}
+
+  .top {display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .author{display:flex;flex-direction:column}
+  .author strong{font-size:15px}
+  .meta{font-size:13px;color:var(--muted);margin-top:4px}
+  .date{font-size:12px;color:#9fb6d6}
+
+  .text{margin-top:10px;color:#dfe8f6;line-height:1.5}
+
+  /* star / rating */
+  .rating{display:inline-block;padding:4px 8px;border-radius:999px;background:linear-gradient(90deg,#1a2b3b,#0f2233);border:1px solid rgba(255,255,255,0.02);font-weight:700;color:var(--accent);letter-spacing:1px}
+  .stars{display:inline-block;margin-left:8px}
+  .star{display:inline-block;margin-right:2px;font-size:14px;line-height:1}
+  /* star shine animation */
+  .rating .star { position:relative; overflow:hidden; display:inline-block; }
+  .rating .star::after{
+    content:'';
+    position:absolute; inset:0;
+    transform:translateX(-110%) skewX(-12deg);
+    background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%);
+    transition:transform .6s ease;
+  }
+  .review:hover .rating .star::after{ transform:translateX(110%) skewX(-12deg); }
+
+  /* reveal animation (stagger using nth-child) */
+  .review{opacity:0;transform:translateY(10px) scale(.995);animation:reveal .6s cubic-bezier(.2,.9,.3,1) forwards}
+  @keyframes reveal{to{opacity:1;transform:none}}
+  /* stagger delays for first 8 items */
+  #reviews-list .review:nth-child(1){animation-delay:.06s}
+  #reviews-list .review:nth-child(2){animation-delay:.12s}
+  #reviews-list .review:nth-child(3){animation-delay:.18s}
+  #reviews-list .review:nth-child(4){animation-delay:.24s}
+  #reviews-list .review:nth-child(5){animation-delay:.30s}
+  #reviews-list .review:nth-child(6){animation-delay:.36s}
+  #reviews-list .review:nth-child(7){animation-delay:.42s}
+  #reviews-list .review:nth-child(8){animation-delay:.48s}
+  /* beyond 8, small incremental delay using transitionend fallback (fine to leave) */
+
+  /* responsive */
+  @media (max-width:640px){
+    .wrap{padding:18px}
+    .top{flex-direction:row;gap:8px}
+    .author strong{font-size:14px}
+  }
+</style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="wrap" role="main" aria-labelledby="reviews-title">
+      <h1 id="reviews-title">Visitor Reviews</h1>
+      <p class="intro"> </p>
+
+      <!-- START: Reviews list -->
+      <div id="reviews-list">
+
+        <article class="review" aria-label="Review by Amit Kumar">
+          <div class="top">
+            <div class="author">
+              <strong>Amit Kumar</strong>
+              <div class="meta">Port Blair · <span class="rating" aria-hidden="true"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span></div>
+            </div>
+            <div class="date">2025-09-08</div>
+          </div>
+          <div class="text">Amazing sunset spot — the guide Rahul was very helpful. The trail is safe if you go with local knowledge. Highly recommended for photographers.</div>
+        </article>
+
+        <article class="review" aria-label="Review by Sana Roy">
+          <div class="top">
+            <div class="author">
+              <strong>Sana Roy</strong>
+              <div class="meta">Havelock · <span class="rating" aria-hidden="true"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">☆</span></span></div>
+            </div>
+            <div class="date">2025-08-22</div>
+          </div>
+          <div class="text">Radhanagar is beautiful — the sunset is incredible. It gets busy, so walk to the far end for peaceful sand and great photos.</div>
+        </article>
+
+        <article class="review" aria-label="Review by Ravi Patel">
+          <div class="top">
+            <div class="author">
+              <strong>Ravi Patel</strong>
+              <div class="meta">Neil Island · <span class="rating" aria-hidden="true"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></span></div>
+            </div>
+            <div class="date">2025-07-14</div>
+          </div>
+          <div class="text">Homestay meals on Neil were incredible — authentic flavors and very warm hosts. A highlight of the trip.</div>
+        </article>
+
+        <!-- Example additional review (copy/paste to add more) -->
+        <article class="review" aria-label="Review by New Reviewer">
+          <div class="top">
+            <div class="author">
+              <strong>New Reviewer</strong>
+              <div class="meta">Wandoor · <span class="rating" aria-hidden="true"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">☆</span><span class="star">☆</span></span></div>
+            </div>
+            <div class="date">2025-09-10</div>
+          </div>
+          <div class="text">Great place for kayaking at sunrise — bring a dry bag and an early start to catch the calm water.</div>
+        </article>
+
+      </div>
+      <!-- END: Reviews list -->
+
+    </div>
+  </div>
+
+  <!-- Optional: small script to add accessible focus outline on keyboard users -->
+  <script>
+    (function(){
+      // add class when using keyboard to show focus outlines only for keyboard users
+      function handleFirstTab(e){
+        if(e.key === 'Tab'){
+          document.documentElement.classList.add('user-is-tabbing');
+          window.removeEventListener('keydown', handleFirstTab);
+        }
+      }
+      window.addEventListener('keydown', handleFirstTab);
+    })();
+  </script>
+</body>
+</html>
